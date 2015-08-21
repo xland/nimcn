@@ -1,0 +1,45 @@
+#! strip(startswith="<") | strip(trailing=true) | stdtmpl(subsChar='%')
+#proc getArticleList(startRow,articleCount,pageSize:int): string =
+#   result = ""
+#   var sqlStr = "select RowID,article_title,article_summary from Article order by RowID desc limit "& $(startRow) &","& $PageSize
+#   var conn = db_sqlite.open("db.db","","","")
+#   var rows = db_sqlite.getAllRows(conn,sql(sqlStr))
+#   db_sqlite.close(conn)
+<div  id="articleList">
+<script>
+$(function () {
+    var startRow = 0;
+    var articleCount = %{articleCount};
+    var pageSize = %{pageSize};
+    $("#PagePre").click(function () {
+        if (startRow - pageSize < 0) {
+            return;
+        }
+        window.location.href = "/" + (startRow - pageSize)
+    });
+    $("#PageNext").click(function () {
+        if (startRow + pageSize >= articleCount) {
+            return;
+        }
+        window.location.href = "/" + (startRow + pageSize)
+    });
+    if (location.href.search("Search") > 0) {
+        $("#PageNext").hide();
+        $("#PagePre").hide();
+    }
+})
+</script>
+#   for i in 0 .. rows.len-1:
+<article>
+<h4>
+<a href="/viewArticle/%{rows[i][0]}">%{rows[i][1]}</a></h4>
+<div>%{rows[i][2]}</div>
+</article>
+<hr class="am-article-divider">
+#   end for
+</div>
+<ul class="am-pagination blog-pagination">
+    <li class="am-pagination-prev"><button class="am-btn am-btn-default" id="PagePre">&laquo; 上一页</button></li>
+    <li class="am-pagination-next"><button class="am-btn am-btn-default" id="PageNext">下一页 &raquo;</button></li>
+</ul>
+#end proc

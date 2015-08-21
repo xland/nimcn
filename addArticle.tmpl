@@ -1,0 +1,48 @@
+#! strip(startswith="<") | strip(trailing=true) | stdtmpl(subsChar='%')
+#proc addArticle(): string =
+#   result = ""
+<script src="/ueditor/ueditor.config.js"></script>
+<script src="/ueditor/ueditor.all.min.js"></script>
+<script>
+    $(function () {
+        $("#ReturnBtn").click(function () {
+            window.location.href = "/";
+        })
+        var ue = UE.getEditor('editor');
+        $("#SaveBtn").click(function () {
+            var obj = {};
+            obj.title = $("#titleTB").val();
+            obj.summary = $("#SummaryTB").val();
+            obj.content = UE.getEditor('editor').getContent();
+            if (obj.title.length < 1 || obj.summary.length < 1 || obj.content.length < 1) {
+                alert("标题、摘要和正文均不能为空");
+                return;
+            }
+            $.post("/saveArticle", obj, function(data) {
+                if(data == 'true'){
+                    window.location.href = "/";
+                }else{
+                    alert("保存文章出错，请重试");
+                }                
+            });
+        })
+    })
+</script>
+<article class="am-article">
+    <div class="am-article-hd">
+        <div class="am-form am-form-group am-form-file">
+            <input id="titleTB" type="text" placeholder="文章标题" />
+        </div>
+        <div class="am-form am-form-group am-form-file">
+            <input id="SummaryTB" type="text" placeholder="摘要" />
+        </div>
+    </div>
+    <div class="am-article-bd">
+        <script id="editor" type="text/plain" style="width:100%%;height:500px;">
+        </script>
+        <div style="margin-top:6px;">
+            <button id="SaveBtn" class="am-btn am-btn-success am-btn-sm AdBtn" style="width:120px;">保存</button>
+        </div>
+    </div>
+</article>
+#end proc

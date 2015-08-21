@@ -1,65 +1,46 @@
-﻿import ueditor,jester, asyncdispatch, htmlgen, db_sqlite,encodings,strutils,json
+﻿import ueditor,jester, asyncdispatch, htmlgen, db_sqlite,encodings,strutils,json,times,os
 
 var ArticleCount = 0
-var PageSize = 30
+var PageSize = 16
 
 proc InitWeb() = 
     var conn = db_sqlite.open("db.db","","","")
     ArticleCount = db_sqlite.getValue(conn,sql("select count(*) from Article")).parseInt
     db_sqlite.close(conn)
 
+include "articleList.tmpl"
+include "viewArticle.tmpl"
+include "addArticle.tmpl"
+include "common.tmpl"
+
 routes:  
-  get "/GetArticleList/?@StartRow?":
+  get "/?@StartRow?":
     var startRow = 0
     if @"StartRow".len > 0 :
         startRow = @"StartRow".parseInt
-    var sqlStr = "select RowID,article_title,article_summary from Article order by RowID desc limit "& $(startRow) &","& $PageSize
-    var conn = db_sqlite.open("db.db","","","")
-    var rows = db_sqlite.getAllRows(conn,sql(sqlStr))
-    db_sqlite.close(conn)
-    var jrs = json.newJArray()
-    for i in 0 .. rows.len-1:
-        var obj = %*
-            {
-                "article_id": rows[i][0],
-                "article_title": rows[i][1],
-                "article_summary": rows[i][2]
-            }
-        json.add(jrs,obj)
+    let articleList = getArticleList(startRow,ArticleCount,PageSize)
+    let data = getCommon(articleList)
+    resp data
     
-    var data = %*
-        {
-            "ArticleCount": $(ArticleCount),
-            "StartRow": $(startRow),
-            "PageSize": $(PageSize)
-        }
-    json.add(data,"Rows",jrs)
-    var str = $(data)
-    resp str
+  get "/viewArticle/@id":
+    var id = @"id".parseInt
+    let article = viewArticle(id)
+    let data = getCommon(article)
+    resp data
+    
+  get "/addArticle/":
+    let article = addArticle()
+    echo(article)
+    let data = getCommon(article)
+    resp data
   
-  get "/GetArticle/?@ID?":
-    var ID = 0
-    if @"ID".len > 0 :
-        ID = @"ID".parseInt
-    #todo:sql_injection
-    var sqlStr = "select article_title,article_content from Article where RowID = "& $ID    
-    var conn = db_sqlite.open("db.db","","","")
-    var row = db_sqlite.getRow(conn,sql(sqlStr))
-    db_sqlite.close(conn)
-    var obj = %*
-        {
-            "article_title": row[0],
-            "article_content": row[1]
-        }
-    var str = $(obj)
-    resp str
-  post "/AddArticle":
+  post "/saveArticle":
     var title = request.params["title"]
     var summary = request.params["summary"]
     var content = request.params["content"]
     var sqlStr = sql"insert into Article (article_title,article_summary,article_content) values (?,?,?)"
     var conn = db_sqlite.open("db.db","","","")
-    db_sqlite.exec(conn,sqlStr,title,summary,content)
+    var id = db_sqlite.insertID(conn,sqlStr,title,summary,content)
     db_sqlite.close(conn)
     resp "true"
 
@@ -69,6 +50,7 @@ routes:
     
   post "/ueditor/ueditor.handler":
     resp ueditor.PostParamRoutes(request)
+
     
 InitWeb()
 runForever()
