@@ -1,0 +1,1 @@
+nim c -r web.nim
