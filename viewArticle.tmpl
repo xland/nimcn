@@ -1,0 +1,16 @@
+#! strip(startswith="<") | strip(trailing=true) | stdtmpl(subsChar='%')
+#proc viewArticle(id:int): string =
+#   result = ""
+#   var sqlStr = "select article_title,article_content from Article where RowID = "& $id    
+#   var conn = db_sqlite.open("db.db","","","")
+#   var row = db_sqlite.getRow(conn,sql(sqlStr))
+#   db_sqlite.close(conn)
+<article class="am-article">
+    <div class="am-article-hd">
+        <h1 id="titleH1" class="am-article-title am-text-center">%{row[0]}</h1>
+    </div>
+    <div id="articleDiv" class="am-article-bd">
+        %{row[1]}
+    </div>
+</article>
+#end proc
