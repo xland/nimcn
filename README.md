@@ -7,6 +7,7 @@
  - 数据库用的sqlite；
  - WEB服务用的[jester][1]；
  - 富文本编辑器用的[百度ueditor][2]
+ - UI框架用了[amazeUI][5]
  - 源码下载到本地，在源码路径下执行：nim c -r web.nim，即可编译运行程序
  - 开源协议：[WTFPL][3] (Do What The Fuck You Want To Public License)
  - 演示地址：[www.nim-lang.com][4] (因为用的米国的服务器，速度不是很理想，大家多担待)；
@@ -15,8 +16,8 @@
 
 **TODO**
 
- - 注册
- - 登录
+ - 文章评论
+ - 修改密码
  - 文章删除
  - 文章修改
 
@@ -24,4 +25,5 @@
   [2]: http://ueditor.baidu.com/website/
   [3]: https://en.wikipedia.org/wiki/WTFPL
   [4]: http://www.nim-lang.com/
+  [5]: http://amazeui.org/
   [5]: http://www.cnblogs.com/liulun
