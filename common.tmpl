@@ -98,7 +98,7 @@
                     <button id="SearchBtn" type="button" class="am-btn am-btn-default am-btn-sm">搜索</button>
                     <div class="am-btn-group">
 #   if s.isLogin:
-                        <button class="am-btn am-btn-secondary  am-btn-sm">%{s.userName}</button>
+                        <a  href="/userCenter" class="am-btn am-btn-secondary  am-btn-sm">%{s.userName}</a>
                         <button  id="LogoutBtn" class="am-btn am-btn-secondary  am-btn-sm">登出</button>
 #   else: 
                         <button  id="LoginBtn"  class="am-btn am-btn-secondary  am-btn-sm">登录</button>
@@ -136,7 +136,7 @@
             <small>
                 CopyRight 2015 nim-lang.com;
                 <a href="https://github.com/xland/nimcn" target="_blank">source code at github</a>;
-                <hr />
+                <br />
                 Licence:WTFPL(Do What The Fuck You Want To Public License)
             </small>
         </p>

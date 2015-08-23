@@ -1,0 +1,65 @@
+#! strip(startswith="<") | strip(trailing=true) | stdtmpl(subsChar='%')
+#proc userCenter(startRow,pageSize,nimerId:int): string =
+#   result = ""
+#   var sqlStr = "select RowID,article_title from Article order by RowID desc limit "& $(startRow) &","& $pageSize
+#   var rows = conn.getAllRows(sql(sqlStr))
+#   var articleCount = conn.getValue(sql("select count(*) from Article where nimer_id = "& $(nimerId)))
+<script>
+    $(function () {
+        var startRow = %{startRow};
+        var articleCount = %{articleCount};
+        var pageSize = %{pageSize};
+        $("#PagePre").click(function () {
+            if (startRow - pageSize < 0) {
+                return;
+            }
+            window.location.href = "/userCenter?startRow=" + (startRow - pageSize)
+        });
+        $("#PageNext").click(function () {
+            if (startRow + pageSize >= articleCount) {
+                return;
+            }
+            window.location.href = "/userCenter?startRow=" + (startRow + pageSize)
+        });
+    })
+    var deleteArticle = function(id){
+        var flag = confirm("您确实要删除这篇文章吗？");
+        if(flag){
+            $.post("/deleteArticle",{'rowId':id},function(data){
+                if(data == "true"){
+                     window.location.href =  window.location.href;
+                }else{
+                    alert("删除文章失败");
+                }
+            })
+        }
+        
+    }
+</script>
+<div class="am-btn-group  am-fr" style="margin-bottom:12px;">
+    <button href="/userCenter" class="am-btn am-btn-secondary  am-btn-sm">修改密码(未完成)</button>
+</div>
+<table class="am-table">
+#   for i in 0 .. rows.len-1:
+        <tr>
+            <td>
+                %{rows[i][1]}
+            </td>
+            <td style="width:160px;text-align:right">
+                <span style="cursor:pointer" class="am-badge am-radius  am-badge-primary">修改(未完成)</span>
+                <span onclick="deleteArticle(%{rows[i][0]});" style="cursor:pointer" class="am-badge am-radius  am-badge-danger  deleteBtn">删除</span>
+            </td>
+        </tr>
+#   end for
+        <tr>
+            <td>
+            </td>
+            <td style="width:100px;">
+            </td>
+        </tr>
+</table>
+<ul class="am-pagination blog-pagination">
+    <li class="am-pagination-prev"><button class="am-btn am-btn-default" id="PagePre">&laquo; 上一页</button></li>
+    <li class="am-pagination-next"><button class="am-btn am-btn-default" id="PageNext">下一页 &raquo;</button></li>
+</ul>
+#end proc

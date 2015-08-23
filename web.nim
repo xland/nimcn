@@ -9,8 +9,8 @@ type
     resp:Response
 
 var conn = db_sqlite.open("db.db","","","")
-var ArticleCount = conn.getValue(sql("select count(*) from Article")).parseInt
-var PageSize = 16
+var articleCount = conn.getValue(sql("select count(*) from Article")).parseInt
+var pageSize = 16
 var sessionTimeOutHour = 1
 var startRow = 0
 
@@ -32,11 +32,12 @@ proc checkLogin(s: var TSession) =
         s.sessionId  = generateUUID()
         conn.exec(updateSessionIdSql,s.sessionId,oldSessionId)
 
+include "userCenter.tmpl"    
 include "articleList.tmpl"
 include "viewArticle.tmpl"
 include "addArticle.tmpl"
 include "common.tmpl"
-    
+
 
 template cookie(name, value: string, expires: TimeInfo): stmt =
     bind setCookie
@@ -61,13 +62,13 @@ routes:
     get "/@StartRow/":
         createSession()
         startRow = @"StartRow".parseInt
-        let articleList = getArticleList(startRow,ArticleCount,PageSize)
+        let articleList = getArticleList(startRow,articleCount,pageSize)
         let data = getCommon(articleList,s)
         resp data
         
     get "/":
         createSession()
-        let articleList = getArticleList(startRow,ArticleCount,PageSize)
+        let articleList = getArticleList(startRow,articleCount,pageSize)
         let data = getCommon(articleList,s)
         resp data
     
@@ -78,11 +79,38 @@ routes:
         let data = getCommon(article,s)
         resp data
     
+    get "/userCenter":        
+        createSession()
+        if s.isLogin:
+            var startRow = 0
+            if request.params["startRow"].len >0:
+                startRow = request.params["startRow"].parseInt
+            let userCenter = userCenter(startRow,pageSize,s.nimerId)
+            let data = getCommon(userCenter,s)
+            resp data            
+        else:
+            redirect( uri("/") )
+    
+    post "/deleteArticle":        
+        createSession()
+        if s.isLogin:
+            if request.params["rowId"].len > 0:
+                var rowId = request.params["rowId"]
+                conn.exec(sql("delete from Article where RowId = "&rowId&" and nimer_id="& $(s.nimerId)))
+                resp "true"
+            else:
+                resp "false"
+        else:
+            resp "false"
+    
     get "/addArticle":
         createSession()
-        let article = addArticle()
-        let data = getCommon(article,s)
-        resp data
+        if s.isLogin:
+            let article = addArticle()
+            let data = getCommon(article,s)
+            resp data
+        else:            
+            redirect( uri("/") )
     
     post "/saveArticle":
         createSession()

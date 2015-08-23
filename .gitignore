@@ -1,3 +1,6 @@
 *.c
 *.o
 *.exe
+db1.db
+public/amazeui/js/jquery.min.js
+*.png
