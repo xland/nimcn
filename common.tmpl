@@ -1,13 +1,15 @@
 #! strip(startswith="<") | strip(trailing=true) | stdtmpl(subsChar='%')
-#proc getCommon(subPage:string): string =
+#proc getCommon(subPage:string,s:TSession): string =
 #   result = ""
 <!DOCTYPE html>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="shortcut icon" href="/favicon.ico">
     <link href="/amazeui/css/amazeui.min.css" rel="stylesheet" />
     <script src="/amazeui/js/jquery.min.js"></script>
     <script src="/amazeui/js/amazeui.min.js"></script>
+    <script src="/cookieHelper.js"></script>
     <title>nim编程语言-中国社区</title>
     <style>
         .am-article-bd a {
@@ -16,8 +18,68 @@
     </style>
     <script>
         $(function () {
-            $("#AddArticleBtn").click(function () {
-                window.location.href = "/addArticle/";
+            $("#RegisterBtn").click(function(){
+                $('#RegisterModal').modal({width: 360, height: 286});
+                return false;
+            });
+            $("#LoginBtn").click(function(){
+                $('#LoginModal').modal({width: 360, height: 236});
+                return false;
+            });
+            $("#LogoutBtn").click(function(){
+                Cookies.set('session_id', '');
+                window.location.href = "/";
+                return false;
+            });
+            $("#CancelLogin").click(function(){
+                $('#LoginModal').modal("close");
+            });
+            $("#CancelRegist").click(function(){
+                $('#RegisterModal').modal("close");
+            });
+            $("#RegistSubmitBtn").click(function(){
+                var obj = {};
+                obj.Email = $.trim($("#Email").val());
+                obj.PassWord = $.trim($("#PassWord").val());
+                obj.UserName = $.trim($("#UserName").val());
+                var patternEmail = obj.Email .search(/^([a-zA-Z0-9]+[_|_|.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|_|.]?)*[a-zA-Z0-9]+\.(?:com|cn)$/) == -1
+                if(patternEmail||obj.PassWord.length<4||obj.UserName.length<1){
+                    alert("邮箱、昵称或者密码不能为空或格式不正确")
+                    return;
+                }
+                $.post("/regist", obj, function(data) {
+                    if(data == 'true'){
+                        $('#RegisterModal').modal("close");
+                        if(window.articleCallback){
+                            window.articleCallback();
+                            return false;
+                        }
+                        window.location.href = "/";
+                    }else{
+                        alert(data);
+                    } 
+                });
+            })
+            $("#LoginSubmitBtn").click(function(){
+                var obj = {};
+                obj.Email = $.trim($("#LoginEmail").val());
+                obj.PassWord = $.trim($("#LoginPassWord").val());
+                if(obj.Email.length<1||obj.PassWord.length<1){
+                    alert("邮箱或者密码不能为空")
+                    return;
+                }
+                $.post("/login", obj, function(data) {
+                    if(data == 'true'){
+                        $('#LoginModal').modal("close");
+                        if(window.articleCallback){
+                            window.articleCallback();
+                            return false;
+                        }
+                        window.location.href = "/";
+                    }else{
+                        alert(data);
+                    } 
+                });
             })
         })
     </script>
@@ -28,67 +90,118 @@
             <h1 class="am-topbar-brand">
                 <a href="/">nim编程语言-中国社区</a>
             </h1>
-
-            <button class="am-topbar-btn am-topbar-toggle am-btn am-btn-sm am-btn-success am-show-sm-only"
-                    data-am-collapse="{target: '#doc-topbar-collapse'}">
-                <span class="am-sr-only">导航切换</span> <span class="am-icon-bars"></span>
-            </button>
-
             <div class="am-collapse am-topbar-collapse" id="doc-topbar-collapse">
                 <form class="am-topbar-form am-topbar-left am-form-inline am-topbar-right" role="search" style="margin-top: 6px; padding: 0px; margin-right: 0px">
                     <div class="am-form-group">
                         <input id="SearchTxt" type="text" class="am-form-field am-input-sm" placeholder="此功能未完成">
                     </div>
                     <button id="SearchBtn" type="button" class="am-btn am-btn-default am-btn-sm">搜索</button>
+                    <div class="am-btn-group">
+#   if s.isLogin:
+                        <button class="am-btn am-btn-secondary  am-btn-sm">%{s.userName}</button>
+                        <button  id="LogoutBtn" class="am-btn am-btn-secondary  am-btn-sm">登出</button>
+#   else: 
+                        <button  id="LoginBtn"  class="am-btn am-btn-secondary  am-btn-sm">登录</button>
+                        <button  id="RegisterBtn" class="am-btn am-btn-secondary  am-btn-sm">注册</button>
+#   end if
+                    </div>
                 </form>
-
             </div>
         </div>
     </header>
-
-
     <div class="am-g am-g-fixed blog-g-fixed">
         <div class="am-u-md-8">
             %{subPage}
         </div>
         <div class="am-u-md-4 blog-sidebar">
             <div class="am-panel-group">
-
                 <section class="am-panel am-panel-default">
-                    <div class="am-panel-hd">文章目录</div>
+                    <div class="am-panel-hd">分类</div>
                     <div class="am-panel-bd">
-                        <span class="am-badge am-radius">此功能尚未完成</span>
+                        <a href="" class="am-badge am-radius">To Do List</a>
                     </div>
                 </section>
                 <section class="am-panel am-panel-default">
                     <div class="am-panel-hd">操作</div>
                     <div class="am-panel-bd">
-                        <button id="AddArticleBtn" class="am-btn am-btn-success am-btn-sm AdBtn">增加文章</button>
+                        <a href="/addArticle" class="am-btn am-btn-secondary am-btn-sm AdBtn">增加文章</a>
                     </div>
                 </section>
-
             </div>
         </div>
-
     </div>
     <footer class="am-margin-top am-container">
         <hr />
         <p class="am-text-center">
             <small>
-                CopyRight 2015 nim-lang.com
+                CopyRight 2015 nim-lang.com;
+                <a href="https://github.com/xland/nimcn" target="_blank">source code at github</a>;
+                <hr />
+                Licence:WTFPL(Do What The Fuck You Want To Public License)
             </small>
         </p>
     </footer>
-    <div class="am-modal am-modal-no-btn" tabindex="-1" id="AdModal">
+    <div class="am-modal am-modal-no-btn" tabindex="-1" id="RegisterModal">
         <div class="am-modal-dialog">
             <div class="am-modal-hd" style="margin-bottom: 6px;">
-                这里放点东西
+                注册用户
             </div>
             <div class="am-modal-bd">
                 <div class="am-form am-form-horizontal">
-                    <p>
-                        这里放点东西
-                    </p>
+                    <div class="am-form-group">
+                      <label for="Email"  class="am-u-sm-3 am-form-label">邮箱：</label>
+                      <div class="am-u-sm-9">
+                      <input type="email" class="" id="Email" placeholder="输入电子邮件">
+                      </div>
+                    </div>
+                    <div class="am-form-group">
+                      <label for="UserName"  class="am-u-sm-3 am-form-label">昵称：</label>
+                      <div class="am-u-sm-9">
+                      <input type="text" class="" id="UserName" placeholder="输入用户昵称">
+                      </div>
+                    </div>
+                    <div class="am-form-group">
+                      <label for="PassWord"  class="am-u-sm-3 am-form-label">密码：</label>
+                      <div class="am-u-sm-9">
+                      <input type="password" class="" id="PassWord" placeholder="输入用户密码，双MD5加盐">
+                      </div>
+                    </div>
+                    <div class="am-form-group">
+                        <div class="am-u-sm-12 am-text-center">
+                        <button id="RegistSubmitBtn" type="button" class="am-btn am-btn-secondary am-radius">注册</button>
+                        <button id="CancelRegist" type="button" class="am-btn am-btn-default am-radius">取消</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="am-modal am-modal-no-btn" tabindex="-1" id="LoginModal">
+        <div class="am-modal-dialog">
+            <div class="am-modal-hd" style="margin-bottom: 6px;">
+                用户登录
+            </div>
+            <div class="am-modal-bd">
+                <div class="am-form am-form-horizontal">
+                    <div class="am-form-group">
+                      <label for="LoginEmail"  class="am-u-sm-3 am-form-label">邮箱：</label>
+                      <div class="am-u-sm-9">
+                      <input type="email" class="" id="LoginEmail" placeholder="输入电子邮件">
+                      </div>
+                    </div>
+                    <div class="am-form-group">
+                      <label for="LoginPassWord"  class="am-u-sm-3 am-form-label">密码：</label>
+                      <div class="am-u-sm-9">
+                      <input type="password" class="" id="LoginPassWord" placeholder="输入用户密码">
+                      </div>
+                    </div>
+                    <div class="am-form-group">
+                        <div class="am-u-sm-12 am-text-center">
+                        <button id="LoginSubmitBtn" type="button" class="am-btn am-btn-secondary am-radius">登录</button>
+                        <button id="CancelLogin" type="button" class="am-btn am-btn-default am-radius">取消</button>
+                        <a  href='javascript: $("#LoginModal").modal("close");$("#RegisterBtn").click();'>注册用户</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

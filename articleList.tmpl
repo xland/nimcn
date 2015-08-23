@@ -2,9 +2,7 @@
 #proc getArticleList(startRow,articleCount,pageSize:int): string =
 #   result = ""
 #   var sqlStr = "select RowID,article_title,article_summary from Article order by RowID desc limit "& $(startRow) &","& $PageSize
-#   var conn = db_sqlite.open("db.db","","","")
 #   var rows = db_sqlite.getAllRows(conn,sql(sqlStr))
-#   db_sqlite.close(conn)
 <div  id="articleList">
 <script>
 $(function () {
@@ -15,13 +13,13 @@ $(function () {
         if (startRow - pageSize < 0) {
             return;
         }
-        window.location.href = "/" + (startRow - pageSize)
+        window.location.href = "/" + (startRow - pageSize)+"/"
     });
     $("#PageNext").click(function () {
         if (startRow + pageSize >= articleCount) {
             return;
         }
-        window.location.href = "/" + (startRow + pageSize)
+        window.location.href = "/" + (startRow + pageSize)+"/"
     });
     if (location.href.search("Search") > 0) {
         $("#PageNext").hide();
