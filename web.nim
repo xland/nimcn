@@ -138,22 +138,35 @@ routes:
         else:
             resp "needLogin"
     
+    post "/updatePassWord":
+        createSession()
+        if s.isLogin:
+            var passWord = request.params["NewPssWord1"]
+            passWord = md5.getMD5("∩_∩"&passWord&"^_^")
+            passWord = md5.getMD5("^_^"&passWord&"∩_∩")
+            var sqlStr = sql"update Nimer set pass_word=? where RowId = ?"
+            conn.exec(sqlStr,passWord,s.nimerId)
+            resp "true"
+        else:
+            resp "needLogin"
+    
+    
     post "/regist":
         var Email = request.params["Email"]
-        var PassWord = request.params["PassWord"]
-        var UserName = request.params["UserName"]
+        var passWord = request.params["PassWord"]
+        var userName = request.params["UserName"]
         var checkSql = sql"select count(*) from Nimer where email = ?;"
         var sqlStr = sql"insert into Nimer (user_name,pass_word,email,session_id) values (?,?,?,?)"
         var count =  db_sqlite.getValue(conn,checkSql,Email)
         if count != "0":
             resp "邮箱已经被注册过了"
         else:
-            PassWord = md5.getMD5("∩_∩"&PassWord&"^_^")
-            PassWord = md5.getMD5("^_^"&PassWord&"∩_∩")
+            passWord = md5.getMD5("∩_∩"&passWord&"^_^")
+            passWord = md5.getMD5("^_^"&passWord&"∩_∩")
             var sessionId = generateUUID()
             var interval = times.initInterval(hours=sessionTimeOutHour)
             var sessionTimeout = getLocalTime(getTime())+interval
-            conn.exec(sqlStr,UserName,PassWord,Email,sessionId)
+            conn.exec(sqlStr,userName,passWord,Email,sessionId)
             cookie("session_id",sessionId,sessionTimeout)
             resp "true"
     post "/login":

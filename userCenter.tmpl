@@ -21,6 +21,33 @@
             }
             window.location.href = "/userCenter?startRow=" + (startRow + pageSize)
         });
+        $("#EditPassWordModelBtn").click(function(){
+            $("#EditPassWordModal").modal({width: 550, height: 286});
+        });
+        $("#PassWordUpdateBtn").click(function(){
+            var obj = {};
+            obj.OldPssWord = $("#OldPassWord").val();
+            obj.NewPssWord1 = $("#NewPassWord1").val();
+            obj.NewPssWord2 = $("#NewPassWord2").val();
+            if (obj.OldPssWord.length < 4 || obj.NewPssWord1.length < 4 || obj.NewPssWord2.length < 4|| obj.NewPssWord1 != obj.NewPssWord2) {
+                alert("密码最小不能小于4位，或者两次输入的密码不一致");
+                return;
+            }
+             $.post("/updatePassWord", obj, function(data) {
+                if(data == 'true'){
+                    alert("修改成功");
+                    $("#EditPassWordModal").modal("close");
+                }else if(data == "needLogin"){
+                    $("#EditPassWordModal").modal("close");
+                    $("#LoginBtn").click();
+                }else{
+                    alert("修改密码出错，请重试");
+                }
+             });
+        });
+        $("#PassWordUpdateCancelBtn").click(function(){
+            $("#EditPassWordModal").modal("close");
+        });
     })
     var deleteArticle = function(id){
         var flag = confirm("您确实要删除这篇文章吗？");
@@ -37,7 +64,7 @@
     }
 </script>
 <div class="am-btn-group  am-fr" style="margin-bottom:12px;">
-    <button href="/userCenter" class="am-btn am-btn-secondary  am-btn-sm">修改密码(未完成)</button>
+    <button id="EditPassWordModelBtn" class="am-btn am-btn-secondary  am-btn-sm">修改密码</button>
 </div>
 <table class="am-table">
 #   for i in 0 .. rows.len-1:
@@ -62,4 +89,39 @@
     <li class="am-pagination-prev"><button class="am-btn am-btn-default" id="PagePre">&laquo; 上一页</button></li>
     <li class="am-pagination-next"><button class="am-btn am-btn-default" id="PageNext">下一页 &raquo;</button></li>
 </ul>
+<div class="am-modal am-modal-no-btn" tabindex="-1" id="EditPassWordModal">
+    <div class="am-modal-dialog">
+        <div class="am-modal-hd" style="margin-bottom: 6px;">
+            用户登录
+        </div>
+        <div class="am-modal-bd">
+            <div class="am-form am-form-horizontal">
+                <div class="am-form-group">
+                  <label for="OldPssWord"  class="am-u-sm-3 am-form-label">原始密码：</label>
+                  <div class="am-u-sm-9">
+                  <input type="password" class="" id="OldPassWord" placeholder="输入原始密码" />
+                  </div>
+                </div>
+                <div class="am-form-group">
+                  <label for="NewPassWord1"  class="am-u-sm-3 am-form-label">新密码：</label>
+                  <div class="am-u-sm-9">
+                  <input type="password" class="" id="NewPassWord1" placeholder="输入新用户密码" />
+                  </div>
+                </div>
+                <div class="am-form-group">
+                  <label for="NewPassWord2"  class="am-u-sm-3 am-form-label">确认新密码：</label>
+                  <div class="am-u-sm-9">
+                  <input type="password" class="" id="NewPassWord2" placeholder="重复输入新用户密码" />
+                  </div>
+                </div>
+                <div class="am-form-group">
+                    <div class="am-u-sm-12 am-text-center">
+                    <button id="PassWordUpdateBtn" type="button" class="am-btn am-btn-secondary am-radius">确定</button>
+                    <button id="PassWordUpdateCancelBtn" type="button" class="am-btn am-btn-default am-radius">取消</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 #end proc

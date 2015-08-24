@@ -44,7 +44,7 @@
                 obj.UserName = $.trim($("#UserName").val());
                 var patternEmail = obj.Email .search(/^([a-zA-Z0-9]+[_|_|.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|_|.]?)*[a-zA-Z0-9]+\.(?:com|cn)$/) == -1
                 if(patternEmail||obj.PassWord.length<4||obj.UserName.length<1){
-                    alert("邮箱、昵称或者密码不能为空或格式不正确")
+                    alert("邮箱、昵称或者密码不能为空(密码最少4位)或格式不正确")
                     return;
                 }
                 $.post("/regist", obj, function(data) {
