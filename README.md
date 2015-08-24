@@ -10,7 +10,7 @@
  - UI框架用了[amazeUI][5]
  - 源码下载到本地，在源码路径下执行：nim c -r web.nim，即可编译运行程序
  - 开源协议：[WTFPL][3] (Do What The Fuck You Want To Public License)
- - 演示地址：[www.nim-lang.com][4] (因为用的米国的服务器，速度不是很理想，大家多担待)；
+ - 演示地址：[www.nim-lang.com][4] (正在申请备案)；
  - 作者博客：[http://www.cnblogs.com/liulun][5]（写的东西也挺杂的）；
  - QQ群：469329878（开发这个程序的过程中，群里很多人都提供了帮助）；
 
