@@ -27,7 +27,6 @@
 **TODO**
 
  - 文章评论
- - 修改密码
 
   [1]: https://github.com/dom96/jester
   [2]: http://ueditor.baidu.com/website/
