@@ -12,7 +12,6 @@ var conn = db_sqlite.open("db.db","","","")
 var articleCount = conn.getValue(sql("select count(*) from Article")).parseInt
 var pageSize = 16
 var sessionTimeOutHour = 1
-var startRow = 0
 
 proc checkLogin(s: var TSession) =
     let oldSessionId = s.req.cookies["session_id"]
@@ -32,6 +31,7 @@ proc checkLogin(s: var TSession) =
         s.sessionId  = generateUUID()
         conn.exec(updateSessionIdSql,s.sessionId,oldSessionId)
 
+include "editArticle.tmpl"
 include "userCenter.tmpl"    
 include "articleList.tmpl"
 include "viewArticle.tmpl"
@@ -61,14 +61,14 @@ template createSession(): stmt =
 routes:  
     get "/@StartRow/":
         createSession()
-        startRow = @"StartRow".parseInt
+        var startRow = @"StartRow".parseInt
         let articleList = getArticleList(startRow,articleCount,pageSize)
         let data = getCommon(articleList,s)
         resp data
         
     get "/":
         createSession()
-        let articleList = getArticleList(startRow,articleCount,pageSize)
+        let articleList = getArticleList(0,articleCount,pageSize)
         let data = getCommon(articleList,s)
         resp data
     
@@ -96,7 +96,7 @@ routes:
         if s.isLogin:
             if request.params["rowId"].len > 0:
                 var rowId = request.params["rowId"]
-                conn.exec(sql("delete from Article where RowId = "&rowId&" and nimer_id="& $(s.nimerId)))
+                conn.exec(sql("delete from Article where RowId = "& rowId &" and nimer_id="& $(s.nimerId)))
                 resp "true"
             else:
                 resp "false"
@@ -112,14 +112,28 @@ routes:
         else:            
             redirect( uri("/") )
     
+    get "/editArticle/@id/":
+        createSession()
+        if s.isLogin:
+            let article = editArticle(@"id".parseInt)
+            let data = getCommon(article,s)
+            resp data
+        else:            
+            redirect( uri("/") )    
+    
     post "/saveArticle":
         createSession()
         if s.isLogin:
             var title = request.params["title"]
             var summary = request.params["summary"]
             var content = request.params["content"]
-            var sqlStr = sql"insert into Article (article_title,article_summary,article_content,nimer_id) values (?,?,?,?)"
-            db_sqlite.exec(conn,sqlStr,title,summary,content,s.nimerId)
+            var id =  request.params["id"]
+            if id.len > 0:
+                var sqlStr = sql"update Article set article_title=?,article_summary=?,article_content=? where nimer_id = ? and RowId = ?"
+                conn.exec(sqlStr,title,summary,content,s.nimerId,id)
+            else:
+                var sqlStr = sql"insert into Article (article_title,article_summary,article_content,nimer_id) values (?,?,?,?)"
+                conn.exec(sqlStr,title,summary,content,s.nimerId)
             resp "true"
         else:
             resp "needLogin"

@@ -46,7 +46,7 @@
                 %{rows[i][1]}
             </td>
             <td style="width:160px;text-align:right">
-                <span style="cursor:pointer" class="am-badge am-radius  am-badge-primary">修改(未完成)</span>
+                <a href="/editArticle/%{rows[i][0]}/" class="am-badge am-radius  am-badge-primary">修改</a>
                 <span onclick="deleteArticle(%{rows[i][0]});" style="cursor:pointer" class="am-badge am-radius  am-badge-danger  deleteBtn">删除</span>
             </td>
         </tr>
