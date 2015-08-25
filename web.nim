@@ -138,6 +138,25 @@ routes:
         else:
             resp "needLogin"
     
+    post "/comment":
+        createSession()
+        if s.isLogin:
+            var comment = request.params["comment"]
+            comment = comment.replace("<","&lt;").replace(">","&gt;")
+            comment = comment.splitLines().join("<br />")
+            var articleId =  request.params["articleId"]
+            if comment.len > 1000 or comment.len < 12:
+                resp "文章评论内容过长，或者过短"
+            else:
+                var sqlStr = sql"insert into Comment (nimer_id,add_time,comment_text,article_id) values (?,?,?,?)"
+                var now = times.getTime()
+                var localTime = times.getLocalTime(now);
+                var nowStr = format(localTime,"yyyy-MM-dd HH:mm:ss")
+                conn.exec(sqlStr,s.nimerId,nowStr,comment,articleId)
+                resp "true"
+        else:
+            resp "needLogin"
+    
     post "/updatePassWord":
         createSession()
         if s.isLogin:

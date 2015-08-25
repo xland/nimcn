@@ -8,7 +8,25 @@
         $("#ReturnBtn").click(function () {
             window.location.href = "/";
         })
-        var ue = UE.getEditor('editor');
+        var ue = UE.getEditor('editor',{
+                elementPathEnabled: false
+                , wordCount: false
+                , saveInterval: 360000
+                , initialStyle: 'p{font-family:微软雅黑;}'
+                , toolbars: [[
+                    'fullscreen', 'source',  'undo', 'redo', 
+                    'bold', 'italic', 'underline', 'fontborder', 'strikethrough', 'superscript', 'subscript', 'removeformat', 'formatmatch', 'autotypeset', 'blockquote', 'pasteplain', 'forecolor', 'backcolor', 'insertorderedlist', 'insertunorderedlist',
+                    'rowspacingtop', 'rowspacingbottom', 'lineheight', 
+                    'customstyle', 'paragraph', 'fontfamily', 'fontsize',
+                    'directionalityltr', 'directionalityrtl', 'indent', 
+                    'justifyleft', 'justifycenter', 'justifyright', 'justifyjustify', 'touppercase', 'tolowercase', 
+                    'link', 'unlink', 'anchor',  'imagenone', 'imageleft', 'imageright', 'imagecenter', 
+                    'simpleupload', 'emotion',  'insertvideo', 'music', 'map', 'insertframe', 'insertcode', 'pagebreak', 'template', 'background',
+                    'horizontal', 'spechars', 'snapscreen', 'wordimage', 
+                    'inserttable', 'deletetable', 'insertparagraphbeforetable', 'insertrow', 'deleterow', 'insertcol', 'deletecol', 'mergecells', 'mergeright', 'mergedown', 'splittocells', 'splittorows', 'splittocols', 'charts', 
+                    'searchreplace'
+                ]]
+            });
         $("#ArticleSaveBtn").click(function () {
             var obj = {};
             obj.title = $("#titleTB").val();

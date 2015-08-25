@@ -2,7 +2,40 @@
 #proc viewArticle(id:int): string =
 #   result = ""
 #   var sqlStr = "select article_title,article_content from Article where RowID = "& $id    
-#   var row = db_sqlite.getRow(conn,sql(sqlStr))
+#   var row = conn.getRow(sql(sqlStr))
+#   var commentRows = conn.getAllRows(sql"select c.comment_text,n.user_name,c.add_time from Comment c left join Nimer n on n.RowID = c.nimer_id  where c.article_id = ?  order by c.add_time desc ", $id)
+<script>
+    $(function(){
+        $("#AddCommentBtn").click(function(){
+            $("#CommentModal").modal({width: 560, height: 300});
+        });
+        $("#CancelCommentBtn").click(function(){
+            $("#CommentModal").modal("close");
+        });
+        $("#CommentSaveBtn").click(function(){
+            var obj = {};
+            obj.comment = $("#CommentTB").val();
+            obj.articleId = %{id}
+            if(obj.comment.length <12 || obj.comment.length>1000){
+                alert("抱歉，您填写的评论内容太少，或者内容太多；")
+                return;
+            }
+            $.post("/comment",obj,function(data){
+                if(data == 'true'){
+                    window.location.href = window.location.href ;
+                }else if(data == "needLogin"){
+                    window.articleCallback = function(){
+                        $("#CommentSaveBtn").click();
+                    }
+                    $("#CommentModal").modal("close");
+                    $("#LoginBtn").click();
+                }else{
+                    alert(data);
+                }
+            })
+        });
+    })
+</script>
 <article class="am-article">
     <div class="am-article-hd">
         <h1 id="titleH1" class="am-article-title am-text-center">%{row[0]}</h1>
@@ -11,4 +44,54 @@
         %{row[1]}
     </div>
 </article>
+<table  class="am-table">
+        <tr>
+            <td  style="border:0px">
+                <hr  data-am-widget="divider" class="am-divider am-divider-dashed" />
+            </td>
+            <td style="width:60px;text-align:right;border:0px">
+                <div id="AddCommentBtn" class="am-badge am-radius  am-badge-primary" style="margin-top:8px;cursor:pointer;">评论文章</div>
+            </td>
+        </tr>
+</table>
+#   for i in 0 .. commentRows.len-1:
+<article class="am-comment" style="margin-bottom:12px;">
+    <a href="#link-to-user-home">
+        <img src="/logo.png" alt="" class="am-comment-avatar" width="48" height="48">
+    </a>
+    <div class="am-comment-main">
+        <header class="am-comment-hd">
+            <div class="am-comment-meta">
+                <a href="#link-to-user" class="am-comment-author">%{commentRows[i][1]}</a>
+            </div>
+            <div class="am-comment-actions" style="line-height:35px;">
+               评论于：%{commentRows[i][2]}
+            </div>
+        </header>
+        <div class="am-comment-bd">
+        <p>&nbsp;&nbsp;%{commentRows[i][0]}&nbsp;&nbsp;</p>
+        </div>
+    </div>
+</article>
+#   end for
+<div class="am-modal am-modal-no-btn" tabindex="-1" id="CommentModal">
+    <div class="am-modal-dialog">
+        <div class="am-modal-hd" style="margin-bottom: 6px;">
+            文章评论
+        </div>
+        <div class="am-modal-bd">
+            <div class="am-form am-form-horizontal">
+                <div class="am-form-group" style=" padding-right: 12px;    padding-left: 12px;">
+                      <textarea id="CommentTB" class="" rows="8" id="doc-ta-1"></textarea>
+                </div>
+                <div class="am-form-group">
+                    <div class="am-u-sm-12 am-text-center">
+                    <button id="CommentSaveBtn" type="button" class="am-btn am-btn-secondary am-radius">提交</button>
+                    <button id="CancelCommentBtn" type="button" class="am-btn am-btn-default am-radius">取消</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 #end proc

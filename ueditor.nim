@@ -108,7 +108,7 @@ proc PostParamRoutes*(request:Request):string =
     of "uploadimage":
         var now = times.getTime()
         var localTime = times.getLocalTime(now);
-        var fileName = format(localTime,"yyyyMMddhhmmss") & "_" & request.formData["upfile"][0]["filename"]
+        var fileName = format(localTime,"yyyyMMddHHmmss") & "_" & request.formData["upfile"][0]["filename"]
         writeFile("./public/upload/"&fileName, request.formData["upfile"].body)
         var data = %*{
                  "state":"SUCCESS",

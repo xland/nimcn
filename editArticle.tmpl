@@ -10,9 +10,6 @@
             window.location.href = "/";
         })
         var ue = UE.getEditor('editor');
-        ue.ready(function(){
-            ue.setContent('%{row[2]}',false);
-        });
         $("#titleTB").val("%{row[0]}");
         $("#SummaryTB").val("%{row[1]}");
         
@@ -52,6 +49,7 @@
     </div>
     <div class="am-article-bd">
         <script id="editor" type="text/plain" style="width:100%%;height:500px;">
+        %{row[2]} 
         </script>
         <div style="margin-top:6px;">
             <button id="ArticleSaveBtn" class="am-btn am-btn-secondary am-btn-sm AdBtn" style="width:120px;">保存</button>
