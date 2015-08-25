@@ -26,7 +26,9 @@
 
 **TODO**
 
- - 文章评论
+ - 文章目录
+ - 吐槽站长
+ - 用户头像
 
   [1]: https://github.com/dom96/jester
   [2]: http://ueditor.baidu.com/website/
