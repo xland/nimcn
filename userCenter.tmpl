@@ -1,8 +1,8 @@
 #! strip(startswith="<") | strip(trailing=true) | stdtmpl(subsChar='%')
 #proc userCenter(startRow,pageSize,nimerId:int): string =
 #   result = ""
-#   var sqlStr = "select RowID,article_title from Article order by RowID desc limit "& $(startRow) &","& $pageSize
-#   var rows = conn.getAllRows(sql(sqlStr))
+#   var sqlStr = sql("select RowID,article_title from Article order by RowID desc limit ?,?")
+#   var rows = conn.getAllRows(sqlStr,startRow,pageSize)
 #   var articleCount = conn.getValue(sql("select count(*) from Article where nimer_id = "& $(nimerId)))
 <script>
     $(function () {
@@ -65,6 +65,9 @@
 </script>
 <div class="am-btn-group  am-fr" style="margin-bottom:12px;">
     <button id="EditPassWordModelBtn" class="am-btn am-btn-secondary  am-btn-sm">修改密码</button>
+    <button id="EditPassWordModelBtn" class="am-btn am-btn-secondary  am-btn-sm" style="margin-left:12px;">用户头像</button>
+    <a href="/addArticle" class="am-btn am-btn-secondary  am-btn-sm" style="margin-left:12px;">增加文章</a>
+    <button id="EditPassWordModelBtn" class="am-btn am-btn-default  am-btn-sm" style="margin-left:12px;">吐槽站长</button>
 </div>
 <table class="am-table">
 #   for i in 0 .. rows.len-1:

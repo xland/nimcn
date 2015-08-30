@@ -1,4 +1,4 @@
-﻿import ueditor,jester, asyncdispatch, htmlgen, db_sqlite,encodings,strutils,json,times,os,md5,nuuid,times,cookies
+﻿import ueditor,jester, asyncdispatch, htmlgen, db_sqlite,encodings,strutils,tables,json,times,os,md5,nuuid,times,cookies
 
 type
   TSession = object of RootObj
@@ -8,12 +8,27 @@ type
     req: Request
     resp:Response
 
-var conn = db_sqlite.open("db.db","","","")
+proc initConfig(cfgFilename: string): Table[string, string] =
+  let
+    inputString = readFile(cfgFilename)
+  var
+    source = ""
+  result = initTable[string, string]()
+  for line in inputString.splitLines:
+    if line.len < 1: continue
+    if line.startsWith("#"): continue
+    var chunks = split(line, ':')
+    if chunks.len != 2:
+      quit("每行必须以:分割" & line)
+    result[chunks[0]] = chunks[1]
+
+var config = initConfig("web.config")
+var conn = db_sqlite.open(config["dbPath"],config["user"],config["password"],config["dbName"])
 var articleCount = conn.getValue(sql("select count(*) from Article")).parseInt
 var pageSize = 16
 var sessionTimeOutHour = 1
 
-proc checkLogin(s: var TSession) =
+proc checkLogin(s: var TSession) =    
     let oldSessionId = s.req.cookies["session_id"]
     if  oldSessionId.len == 0 : return
     var getLoginUserInfoSql = sql"select user_name,email,role,RowId from Nimer where session_id = ?;"  
@@ -31,12 +46,7 @@ proc checkLogin(s: var TSession) =
         s.sessionId  = generateUUID()
         conn.exec(updateSessionIdSql,s.sessionId,oldSessionId)
 
-include "editArticle.tmpl"
-include "userCenter.tmpl"    
-include "articleList.tmpl"
-include "viewArticle.tmpl"
-include "addArticle.tmpl"
-include "common.tmpl"
+include "editArticle.tmpl","userCenter.tmpl","articleList.tmpl","viewArticle.tmpl","addArticle.tmpl","common.tmpl"
 
 
 template cookie(name, value: string, expires: TimeInfo): stmt =
@@ -57,7 +67,12 @@ template createSession(): stmt =
         var interval = times.initInterval(hours=sessionTimeOutHour)
         var sessionTimeout  = getLocalTime(getTime())+interval
         cookie("session_id",s.sessionId,sessionTimeout)
-    
+
+settings:
+    port = Port(config["port"].parseInt)
+    appName = ""
+    bindAddr = config["bindAddr"]
+        
 routes:  
     get "/@StartRow/":
         createSession()
