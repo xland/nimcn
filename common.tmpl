@@ -18,6 +18,18 @@
     </style>
     <script>
         $(function () {
+            $("#PassWord").keydown(function(){
+                if(event.keyCode==13) {
+                    $('#RegistSubmitBtn').click();
+                    return false;
+                }
+            });
+            $("#LoginPassWord").keydown(function(){
+                if(event.keyCode==13) {
+                    $('#LoginSubmitBtn').click();
+                    return false;
+                }
+            });
             $("#RegisterBtn").click(function(){
                 $('#RegisterModal').modal({width: 360, height: 286});
                 return false;
@@ -98,7 +110,7 @@
                     <button id="SearchBtn" type="button" class="am-btn am-btn-default am-btn-sm">搜索</button>
                     <div class="am-btn-group">
 #   if s.isLogin:
-                        <a  href="/userCenter" class="am-btn am-btn-secondary  am-btn-sm">%{s.userName}</a>
+                        <a  href="/userCenter" style="color:#ffffff" class="am-btn am-btn-secondary  am-btn-sm">%{s.userName}</a>
                         <button  id="LogoutBtn" class="am-btn am-btn-secondary  am-btn-sm">登出</button>
 #   else: 
                         <button  id="LoginBtn"  class="am-btn am-btn-secondary  am-btn-sm">登录</button>
@@ -188,13 +200,13 @@
                     <div class="am-form-group">
                       <label for="LoginEmail"  class="am-u-sm-3 am-form-label">邮箱：</label>
                       <div class="am-u-sm-9">
-                      <input type="email" class="" id="LoginEmail" placeholder="输入电子邮件">
+                      <input type="email"  id="LoginEmail" placeholder="输入电子邮件">
                       </div>
                     </div>
                     <div class="am-form-group">
                       <label for="LoginPassWord"  class="am-u-sm-3 am-form-label">密码：</label>
                       <div class="am-u-sm-9">
-                      <input type="password" class="" id="LoginPassWord" placeholder="输入用户密码">
+                      <input type="password" id="LoginPassWord" placeholder="输入用户密码">
                       </div>
                     </div>
                     <div class="am-form-group">

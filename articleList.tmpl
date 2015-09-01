@@ -2,7 +2,7 @@
 #proc getArticleList(startRow,articleCount,pageSize:int): string =
 #   result = ""
 #   var sqlStr = "select RowID,article_title,article_summary from Article order by RowID desc limit "& $(startRow) &","& $pageSize
-#   var rows = db_sqlite.getAllRows(conn,sql(sqlStr))
+#   var rows = conn.getAllRows(sql(sqlStr))
 <div  id="articleList">
 <script>
 $(function () {
